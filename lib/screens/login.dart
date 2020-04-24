@@ -18,7 +18,7 @@ class Login extends StatelessWidget {
             onSubmitted: (value) async {
               User user = await MoodleClient().authenticate(value);
               if (user.userId != null) {
-                //TODO: show courses page
+                Navigator.pushNamed(context, '/courses', arguments: user);
               } else {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
