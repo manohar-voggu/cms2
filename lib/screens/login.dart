@@ -1,3 +1,5 @@
+import 'package:cms_flutter/models/user.dart';
+import 'package:cms_flutter/services/moodle_client.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatelessWidget {
@@ -7,12 +9,27 @@ class Login extends StatelessWidget {
       appBar: AppBar(
         title: Text('Login'),
       ),
-      body: Center(
-        child: TextField(
-          decoration: InputDecoration(labelText: 'token'),
-          onSubmitted: (value) {},
-        ),
-      ),
+      body: Builder(builder: (BuildContext context) {
+        // Use a separate builder for scaffold,
+        // so as to access it's context with Scaffold.of(context)
+        return Center(
+          child: TextField(
+            decoration: InputDecoration(labelText: 'token'),
+            onSubmitted: (value) async {
+              User user = await MoodleClient().authenticate(value);
+              if (user.userId != null) {
+                //TODO: show courses page
+              } else {
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Unauthorized'),
+                  ),
+                );
+              }
+            },
+          ),
+        );
+      }),
     );
   }
 }
