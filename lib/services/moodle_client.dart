@@ -44,4 +44,21 @@ class MoodleClient {
       return [];
     }
   }
+
+  Future<List> getSections(String token, int courseId) async {
+    var params = {
+      'wsfunction': 'core_course_get_contents',
+      'moodlewsrestformat': 'json',
+      'wstoken': '$token',
+      'courseid': '$courseId'
+    };
+    var uri = Uri.https(host, path, params);
+    Response resp = await get(uri);
+    if (resp.statusCode == 200) {
+      List decoded = json.decode(resp.body) as List;
+      return decoded;
+    } else {
+      return [];
+    }
+  }
 }

@@ -4,5 +4,6 @@ class User {
   String email;
   String dpUrl;
   String token;
+
   User({this.userId, this.fullName, this.email, this.dpUrl, this.token});
 }

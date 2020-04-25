@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:cms_flutter/models/course.dart';
 import 'package:cms_flutter/services/moodle_client.dart';
 import 'package:cms_flutter/models/user.dart';
+import 'package:flutter/material.dart';
 
 class Courses extends StatefulWidget {
   Courses({Key key}) : super(key: key);
@@ -29,7 +30,15 @@ class _CoursesState extends State<Courses> {
                         snapshot.data[index]['fullname'],
                       ),
                       onTap: () {
-                        //TODO: show course section page
+                        Course course = Course(
+                          id: snapshot.data[index]['id'],
+                          name: snapshot.data[index]['fullname'],
+                          userCount: snapshot.data[index]['enrolledusercount'],
+                          // Warning: lastAccess can be null
+                          lastAccess: snapshot.data[index]['lastaccess'],
+                        );
+                        Navigator.pushNamed(context, '/section',
+                            arguments: {'user': user, 'course': course});
                       },
                     ),
                   );
