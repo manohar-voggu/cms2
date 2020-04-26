@@ -2,6 +2,7 @@ import 'package:cms_flutter/models/course.dart';
 import 'package:cms_flutter/models/user.dart';
 import 'package:cms_flutter/services/moodle_client.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class Section extends StatefulWidget {
   Section({Key key}) : super(key: key);
@@ -36,7 +37,24 @@ class _SectionState extends State<Section> {
                     child: ExpansionTile(
                       title: Text(snapshot.data[index]['name']),
                       children: modules.map((module) {
+                        final Widget modIcon = FutureBuilder(
+                            future:
+                                MoodleClient().getCacheFile(module['modicon']),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasData) {
+                                if (module['modname'] == 'resource') {
+                                  return Image.file(snapshot.data);
+                                } else
+                                  return SvgPicture.file(snapshot.data);
+                              } else if (snapshot.hasError) {
+                                return Text('${snapshot.error}');
+                              } else {
+                                return CircularProgressIndicator();
+                              }
+                            });
                         return ListTile(
+                          leading: modIcon,
                           title: Text(module['name']),
                           onTap: () {
                             //TODO: show contents of module

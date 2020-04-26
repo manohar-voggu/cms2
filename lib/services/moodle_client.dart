@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cms_flutter/models/user.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart';
 
 class MoodleClient {
@@ -60,5 +61,9 @@ class MoodleClient {
     } else {
       return [];
     }
+  }
+
+  Future getCacheFile(String url) async {
+    return await DefaultCacheManager().getSingleFile(url);
   }
 }
