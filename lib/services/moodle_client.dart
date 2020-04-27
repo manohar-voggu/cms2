@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cms_flutter/models/user.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart';
@@ -39,7 +40,7 @@ class MoodleClient {
     var uri = Uri.https(host, path, params);
     Response resp = await get(uri);
     if (resp.statusCode == 200) {
-      List decoded = json.decode(resp.body) as List;
+      List decoded = json.decode(resp.body);
       return decoded;
     } else {
       return [];
@@ -56,14 +57,14 @@ class MoodleClient {
     var uri = Uri.https(host, path, params);
     Response resp = await get(uri);
     if (resp.statusCode == 200) {
-      List decoded = json.decode(resp.body) as List;
+      List decoded = json.decode(resp.body);
       return decoded;
     } else {
       return [];
     }
   }
 
-  Future getCacheFile(String url) async {
+  Future<File> getCacheFile(String url) async {
     return await DefaultCacheManager().getSingleFile(url);
   }
 }
