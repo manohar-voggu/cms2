@@ -6,7 +6,6 @@ void main() {
 }
 
 class CMS extends StatelessWidget {
-  final String initialRoute = '/login';
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

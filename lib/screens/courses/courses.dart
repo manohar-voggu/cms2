@@ -1,9 +1,10 @@
-import 'package:cms_flutter/models/course.dart';
-import 'package:cms_flutter/services/moodle_client.dart';
-import 'package:cms_flutter/models/user.dart';
 import 'package:flutter/material.dart';
+import 'package:cms_flutter/models/user.dart';
+import 'package:cms_flutter/models/course.dart';
+import 'package:cms_flutter/services/moodle_client.dart' as moodle;
 
 class Courses extends StatefulWidget {
+  static const String routeName = '/courses';
   Courses({Key key}) : super(key: key);
   @override
   _CoursesState createState() => _CoursesState();
@@ -18,7 +19,7 @@ class _CoursesState extends State<Courses> {
         title: Text('Courses'),
       ),
       body: FutureBuilder(
-          future: MoodleClient().getCourses(user.token, user.userId),
+          future: moodle.getCourses(user.token, user.userId),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
@@ -37,7 +38,7 @@ class _CoursesState extends State<Courses> {
                           // Warning: lastAccess can be null
                           lastAccess: snapshot.data[index]['lastaccess'],
                         );
-                        Navigator.pushNamed(context, '/section',
+                        Navigator.pushNamed(context, '/sections',
                             arguments: {'user': user, 'course': course});
                       },
                     ),

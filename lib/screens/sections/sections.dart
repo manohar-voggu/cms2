@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cms_flutter/models/course.dart';
 import 'package:cms_flutter/models/user.dart';
-import 'package:cms_flutter/services/moodle_client.dart';
+import 'package:cms_flutter/services/moodle_client.dart' as moodle;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,6 +11,7 @@ import 'package:html/parser.dart';
 import 'package:open_file/open_file.dart' as opFile;
 
 class Sections extends StatefulWidget {
+  static const String routeName = '/sections';
   Sections({Key key}) : super(key: key);
 
   @override
@@ -37,7 +38,7 @@ class _SectionsState extends State<Sections> {
         title: Text(course.name),
       ),
       body: FutureBuilder(
-          future: MoodleClient().getSections(user.token, course.id),
+          future: moodle.getSections(user.token, course.id),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
@@ -51,7 +52,7 @@ class _SectionsState extends State<Sections> {
                     // get modicon as widget.
                     // modicon is image for resources and svg for others
                     final Widget modIcon = FutureBuilder(
-                        future: MoodleClient().getCacheFile(module['modicon']),
+                        future: moodle.getCacheFile(module['modicon']),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.hasData) {
@@ -66,8 +67,8 @@ class _SectionsState extends State<Sections> {
                             return CircularProgressIndicator();
                           }
                         });
-                    List contents = module['contents'];
 
+                    List contents = module['contents'];
                     if (contents != null) {
                       if (contents.length > 1) {
                         return ExpansionTile(
@@ -82,7 +83,7 @@ class _SectionsState extends State<Sections> {
                                 switch (module['modname']) {
                                   case 'folder':
                                   case 'resource':
-                                    File file = await MoodleClient().getCacheFile(
+                                    File file = await moodle.getCacheFile(
                                         '${contents[contentIndex]['fileurl']}&token=${user.token}');
                                     opFile.OpenFile.open(file.path);
                                     break;
@@ -103,7 +104,7 @@ class _SectionsState extends State<Sections> {
                           switch (module['modname']) {
                             case 'folder':
                             case 'resource':
-                              File file = await MoodleClient().getCacheFile(
+                              File file = await moodle.getCacheFile(
                                   '${contents[0]['fileurl']}&token=${user.token}');
                               opFile.OpenFile.open(file.path);
                               break;
