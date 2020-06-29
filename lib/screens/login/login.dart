@@ -11,8 +11,8 @@ class Login extends StatelessWidget {
         title: Text('Login'),
       ),
       body: Builder(builder: (BuildContext context) {
-        // Use a separate builder for scaffold,
-        // so as to access it's context with Scaffold.of(context)
+        // Create an inner BuildContext so that snackbar onPressed
+        // methods can refer to Scaffold with Scaffold.of()
         return Center(
           child: TextField(
             decoration: InputDecoration(
@@ -28,6 +28,7 @@ class Login extends StatelessWidget {
               if (user.userId != null) {
                 Navigator.pushNamed(context, '/courses', arguments: user);
               } else {
+                Scaffold.of(context).hideCurrentSnackBar();
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Unauthorized'),
