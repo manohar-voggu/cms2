@@ -25,7 +25,7 @@ Future<User> auth(String token) async {
       token: token,
     );
   } else {
-    return User();
+    return null;
   }
 }
 
@@ -42,7 +42,7 @@ Future<List> getCourses(String token, int userId) async {
     List decoded = json.decode(resp.body);
     return decoded;
   } else {
-    return [];
+    return null;
   }
 }
 
@@ -59,7 +59,7 @@ Future<List> getSections(String token, int courseId) async {
     List decoded = json.decode(resp.body);
     return decoded;
   } else {
-    return [];
+    return null;
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:cms_flutter/screens/sections/sections.dart';
 import 'package:flutter/material.dart';
 import 'package:cms_flutter/models/user.dart';
 import 'package:cms_flutter/models/course.dart';
@@ -38,7 +39,7 @@ class _CoursesState extends State<Courses> {
                           // Warning: lastAccess can be null
                           lastAccess: snapshot.data[index]['lastaccess'],
                         );
-                        Navigator.pushNamed(context, '/sections',
+                        Navigator.pushNamed(context, Sections.routeName,
                             arguments: {'user': user, 'course': course});
                       },
                     ),
@@ -51,7 +52,7 @@ class _CoursesState extends State<Courses> {
               );
             } else {
               return Center(
-                child: Text('Loading courses'),
+                child: CircularProgressIndicator(),
               );
             }
           }),

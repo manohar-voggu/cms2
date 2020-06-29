@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cms_flutter/models/course.dart';
 import 'package:cms_flutter/models/user.dart';
 import 'package:cms_flutter/services/moodle_client.dart' as moodle;
@@ -47,72 +46,58 @@ class _SectionsState extends State<Sections> {
                   List modules = snapshot.data[index]['modules'];
 
                   // hide sections which have no modules
+                  if (modules == null) return null;
                   if (modules.length == 0) return null;
-                  List<Widget> sectionChildren = modules.map((module) {
+                  List<Widget> moduleWidgets = modules.map((module) {
                     // get modicon as widget.
                     // modicon is image for resources and svg for others
                     final Widget modIcon = FutureBuilder(
-                        future: moodle.getCacheFile(module['modicon']),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasData) {
-                            if (module['modname'] == 'resource') {
-                              return Image.file(snapshot.data);
-                            } else {
-                              return SvgPicture.file(snapshot.data);
-                            }
-                          } else if (snapshot.hasError) {
-                            return Text('${snapshot.error}');
+                      future: moodle.getCacheFile(module['modicon']),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          if (module['modname'] == 'resource') {
+                            return Image.file(snapshot.data);
                           } else {
-                            return CircularProgressIndicator();
+                            return SvgPicture.file(snapshot.data);
                           }
-                        });
+                        } else if (snapshot.hasError) {
+                          return Text('${snapshot.error}');
+                        } else {
+                          return CircularProgressIndicator();
+                        }
+                      },
+                    );
 
                     List contents = module['contents'];
                     if (contents != null) {
-                      if (contents.length > 1) {
-                        return ExpansionTile(
-                          leading: modIcon,
-                          title: Text(module['name']),
-                          children: contents.map((e) {
-                            int contentIndex = contents.indexOf(e);
-                            return ListTile(
-                              dense: true,
-                              title: Text(e['filename']),
-                              onTap: () async {
-                                switch (module['modname']) {
-                                  case 'folder':
-                                  case 'resource':
-                                    File file = await moodle.getCacheFile(
-                                        '${contents[contentIndex]['fileurl']}&token=${user.token}');
-                                    opFile.OpenFile.open(file.path);
-                                    break;
-                                  case 'url':
-                                    _launchInBrowser(
-                                        '${contents[contentIndex]['fileurl']}');
-                                    break;
-                                }
-                              },
-                            );
-                          }).toList(),
+                      List<Widget> contentWidgets = contents.map((content) {
+                        int contentIndex = contents.indexOf(content);
+                        return ListTile(
+                          dense: contents.length != 1,
+                          title: Text(content['filename']),
+                          onTap: () async {
+                            switch (module['modname']) {
+                              case 'folder':
+                              case 'resource':
+                                File file = await moodle.getCacheFile(
+                                    '${contents[contentIndex]['fileurl']}&token=${user.token}');
+                                opFile.OpenFile.open(file.path);
+                                break;
+                              case 'url':
+                                _launchInBrowser(
+                                    '${contents[contentIndex]['fileurl']}');
+                                break;
+                            }
+                          },
                         );
+                      }).toList();
+                      if (contents.length == 1) {
+                        return contentWidgets[0];
                       }
-                      return ListTile(
+                      return ExpansionTile(
                         leading: modIcon,
                         title: Text(module['name']),
-                        onTap: () async {
-                          switch (module['modname']) {
-                            case 'folder':
-                            case 'resource':
-                              File file = await moodle.getCacheFile(
-                                  '${contents[0]['fileurl']}&token=${user.token}');
-                              opFile.OpenFile.open(file.path);
-                              break;
-                            case 'url':
-                              _launchInBrowser('${contents[0]['fileurl']}');
-                              break;
-                          }
-                        },
+                        children: contentWidgets,
                       );
                     } else {
                       if (module['modname'] == 'forum') {
@@ -128,9 +113,9 @@ class _SectionsState extends State<Sections> {
                           onTap: () async {
                             if (linksFound) {
                               // launch all found links
-                              links.forEach((element) {
+                              links.forEach((link) {
                                 _launchInBrowser(
-                                  element.attributes['href'],
+                                  link.attributes['href'],
                                 );
                               });
                             } else {
@@ -140,6 +125,7 @@ class _SectionsState extends State<Sections> {
                           },
                         );
                       } else {
+                        // unhandled modname
                         return ListTile(
                           leading: Icon(Icons.link),
                           title: Text(module['name']),
@@ -153,7 +139,7 @@ class _SectionsState extends State<Sections> {
                   }).toList();
                   // add section summary(if present) to start of list
                   if (snapshot.data[index]['summary'] != null) {
-                    sectionChildren.insert(
+                    moduleWidgets.insert(
                       0,
                       Text(
                         parse(snapshot.data[index]['summary']).body.text,
@@ -165,7 +151,7 @@ class _SectionsState extends State<Sections> {
                     child: ExpansionTile(
                       // section name as title
                       title: Text(snapshot.data[index]['name']),
-                      children: sectionChildren,
+                      children: moduleWidgets,
                     ),
                   );
                 },
@@ -177,7 +163,7 @@ class _SectionsState extends State<Sections> {
               );
             } else {
               return Center(
-                child: Text('Loading course sections'),
+                child: CircularProgressIndicator(),
               );
             }
           }),
